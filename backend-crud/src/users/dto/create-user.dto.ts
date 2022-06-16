@@ -3,7 +3,7 @@ export class CreateUserDto {
   name: string;
   age: number;
   ghub: string;
-  adrsUF: string;
+  addressUF: string;
   addressCity: string;
   addressDistrict: string;
   addressStreet: string;

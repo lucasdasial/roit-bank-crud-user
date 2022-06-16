@@ -1,15 +1,19 @@
+/* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
+import { FirestoreService } from 'src/firebase/firebase.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
   create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+    const dbContext = new FirestoreService();
+    return createUserDto;
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll() {
+    const dbContext = new FirestoreService();
+    return await dbContext.FindAllUsers();
   }
 
   findOne(id: number) {
@@ -17,7 +21,7 @@ export class UsersService {
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+    return `This action updates a  ${id} user`;
   }
 
   remove(id: number) {

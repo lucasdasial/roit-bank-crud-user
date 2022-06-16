@@ -8,7 +8,7 @@ import {
 } from '@roit/roit-response-handler';
 
 async function bootstrap() {
-  FirebaseService.start;
+  FirebaseService.start();
   const app = await NestFactory.create(AppModule);
   app.useGlobalFilters(new HttpExceptionFilter());
 
