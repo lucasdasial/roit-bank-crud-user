@@ -1,59 +1,71 @@
-/* eslint-disable prettier/prettier */
+import { Injectable } from '@nestjs/common';
 import firebase from 'firebase/app';
-import 'firebase/firestore';
-import { stringify } from 'json5';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { User } from 'src/users/entities/user.entity';
 import { firebaseConfig } from './firebase.config';
+import 'firebase/firestore';
 
+@Injectable()
 export class FirebaseService {
+  db = firebase.firestore();
+
   static start() {
+    console.log('firebase was loading');
     firebase.initializeApp(firebaseConfig);
   }
-}
 
-export class FirestoreService {
-  private db() {
-    return firebase.firestore();
+  async findAll(collection: string) {
+    const list: Array<any> = [];
+    const docs = await this.db.collection(collection).get();
+    docs.forEach((doc) => {
+      const obj = {
+        id: doc.id,
+        ...doc.data(),
+      };
+      list.push(obj);
+    });
+    return list;
   }
 
-  async AddUser(createUserDto: CreateUserDto) {
-    const newUser = {
-      name: createUserDto.name,
-      age: createUserDto.age,
-      ghub: createUserDto.ghub,
-      uf: createUserDto.addressUF,
-      city: createUserDto.addressCity,
-      district: createUserDto.addressDistrict,
-      street: createUserDto.addressStreet,
-      number: createUserDto.addresNumber,
+  async find(collection: string, id: string) {
+    const doc = await this.db.collection(collection).doc(id).get();
+    return doc.data();
+  }
+
+  async createDoc(collection: string, docId: string, obj: any) {
+    type ResposneMsg = {
+      message: string;
+      tag: number;
     };
-    await this.db().collection('users').doc().set(newUser);
-    return newUser;
-  }
-
-  async FindAllUsers() {
-    const users: Array<any> = [];
-    await this.db()
-      .collection('users')
+    let res: ResposneMsg;
+    await this.db
+      .collection(collection)
       .get()
-      .then((res) => {
-        res.forEach((doc) => {
-          users.push(doc.data());
+      .then((docs) => {
+        docs.forEach((doc) => {
+          if (doc.id == docId) {
+            res = { message: 'doc alredy created', tag: 0 };
+            return;
+          }
+          this.db.collection(collection).doc(docId).set(obj);
+          res = { message: 'doc created successfuly', tag: 1 };
         });
       });
-    return users;
+    return res;
   }
 
-  async FindUser(id: number) {
-    const user = await this.db()
-      .collection('users')
-      .doc(stringify(id))
-      .get()
-      .then((docUser) => {
-        return docUser.data();
-      });
-
-    return user;
+  async updateDoc(collection: string, docId: string, updateObj: any) {
+    try {
+      await this.db.collection(collection).doc(docId).update(updateObj);
+      return { message: 'doc updated' };
+    } catch (error) {
+      return { message: 'error when updating' };
+    }
+  }
+  async delDoc(collection: string, docId: string) {
+    try {
+      await this.db.collection(collection).doc(docId).delete();
+      return { message: 'exec delete successfully' };
+    } catch (error) {
+      return { message: 'error when exec delete ' };
+    }
   }
 }

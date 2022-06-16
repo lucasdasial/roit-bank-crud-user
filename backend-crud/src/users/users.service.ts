@@ -1,30 +1,33 @@
 /* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
-import { FirestoreService } from 'src/firebase/firebase.service';
+import { FirebaseService } from 'src/firebase/firebase.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
   create(createUserDto: CreateUserDto) {
-    const dbContext = new FirestoreService();
-    return createUserDto;
+    const dbContext = new FirebaseService();
+    return dbContext.createDoc('users', createUserDto.id, createUserDto);
   }
 
-  async findAll() {
-    const dbContext = new FirestoreService();
-    return await dbContext.FindAllUsers();
+  findAll() {
+    const dbContext = new FirebaseService();
+    return dbContext.findAll('users');
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  findOne(id: string) {
+    const dbContext = new FirebaseService();
+    return dbContext.find('users', id);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a  ${id} user`;
+  update(id: string, updateUserDto: UpdateUserDto) {
+    const dbContext = new FirebaseService();
+    return dbContext.updateDoc('users', id, updateUserDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  remove(id: string) {
+    const dbContext = new FirebaseService();
+    return dbContext.delDoc('users', id);
   }
 }

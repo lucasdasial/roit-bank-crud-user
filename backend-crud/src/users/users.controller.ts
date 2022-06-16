@@ -1,4 +1,5 @@
 /* eslint-disable prettier/prettier */
+import { Response } from 'express';
 import {
   Controller,
   Get,
@@ -7,6 +8,8 @@ import {
   Patch,
   Param,
   Delete,
+  Res,
+  HttpStatus,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -17,8 +20,12 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
+    const result = await this.usersService.create(createUserDto);
+    if (result.tag == 0) {
+      return res.status(HttpStatus.OK).json({ message: result.message });
+    }
+    return res.status(HttpStatus.CREATED).json({ message: result.message });
   }
 
   @Get()
@@ -28,16 +35,16 @@ export class UsersController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+    return this.usersService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+    return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+    return this.usersService.remove(id);
   }
 }
