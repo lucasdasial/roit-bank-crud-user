@@ -2,6 +2,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { FirebaseService } from './firebase/firebase.service';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import {
   HttpExceptionFilter,
   RoitResponseInterceptor,
@@ -14,6 +15,15 @@ async function bootstrap() {
 
   //error de atrbuição de tipagem do param
   //---> app.useGlobalInterceptors(new RoitResponseInterceptor());
+
+  const config = new DocumentBuilder()
+    .setTitle('CRUD USERS')
+    .setDescription('Api crud')
+    .setVersion('1.0')
+    .addTag('Users')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('swagger', app, document);
   await app.listen(3000);
 }
 bootstrap();
