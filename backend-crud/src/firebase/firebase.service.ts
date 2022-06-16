@@ -1,6 +1,7 @@
+/* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import firebase from 'firebase/app';
-import { firebaseConfig } from './firebase.config';
+import { firebaseConfig } from 'firebase.config';
 import 'firebase/firestore';
 
 @Injectable()

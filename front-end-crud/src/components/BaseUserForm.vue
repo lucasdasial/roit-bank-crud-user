@@ -1,7 +1,7 @@
 <script lang="ts">
 import axios from 'axios';
 import { useQuasar } from 'quasar';
-import { createUserDto } from 'src/@types/app';
+import { apiCrudResponse, createUserDto } from 'src/@types/app';
 import { ghubApiResponse } from 'src/@types/ghubApi';
 import { viacepResponse } from 'src/@types/viacep';
 import { defineComponent, reactive } from 'vue';
@@ -17,7 +17,8 @@ export default defineComponent({
       required: true,
     },
   },
-  setup() {
+  emits: ['CloseDialog'],
+  setup(props, emits) {
     const q = useQuasar();
 
     const user = reactive<createUserDto>({
@@ -34,9 +35,11 @@ export default defineComponent({
       addressComplement: null,
     });
 
-    function saveUser(user: createUserDto): void {
-      void axios
-        .post('http://localhost:3000/users', {
+    async function saveUser(user: createUserDto): Promise<void> {
+      q.loading.show();
+      const res = await axios.post<apiCrudResponse>(
+        'http://localhost:3000/users',
+        {
           id: user.id,
           name: user.name,
           age: user.age,
@@ -47,10 +50,24 @@ export default defineComponent({
           addressStreet: user.addressStreet,
           addresNumber: user.addresNumber,
           addressComplement: user.addressComplement,
-        })
-        .then((res) => {
-          console.log(res.data);
+        }
+      );
+      if (res.data.tag == 0) {
+        q.loading.hide();
+        q.notify({
+          message: 'Usuário já existe',
+          type: 'info',
+          position: 'top',
         });
+        return;
+      }
+      emits.emit('CloseDialog');
+      q.loading.hide();
+      q.notify({
+        message: 'Conta criada',
+        type: 'positive',
+        position: 'top',
+      });
     }
 
     function getAddress(cep: string) {

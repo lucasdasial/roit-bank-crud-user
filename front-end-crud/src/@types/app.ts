@@ -19,3 +19,8 @@ export type createUserDto = {
   addresNumber: string;
   addressComplement: null | string;
 };
+
+export type apiCrudResponse = {
+  message: string;
+  tag: number;
+};
