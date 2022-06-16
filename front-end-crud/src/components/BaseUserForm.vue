@@ -1,7 +1,10 @@
 <script lang="ts">
 import axios from 'axios';
+import { useQuasar } from 'quasar';
+import { createUserDto } from 'src/@types/app';
+import { ghubApiResponse } from 'src/@types/ghubApi';
 import { viacepResponse } from 'src/@types/viacep';
-import { defineComponent, ref } from 'vue';
+import { defineComponent, reactive } from 'vue';
 
 export default defineComponent({
   props: {
@@ -15,52 +18,78 @@ export default defineComponent({
     },
   },
   setup() {
-    const id = ref();
-    const name = ref('');
-    const age = ref();
-    const githubProfile = ref('');
+    const q = useQuasar();
 
-    const cep = ref();
-    let state = ref();
-    let city = ref();
-    let district = ref();
-    let street = ref();
-    let addressNumber = ref();
-    const complement = ref();
-    let timer: string | number | NodeJS.Timeout | undefined;
+    const user = reactive<createUserDto>({
+      id: '',
+      name: '',
+      age: 0,
+      ghub: '',
+      cep: '',
+      addressUF: '',
+      addressCity: '',
+      addressDistrict: '',
+      addressStreet: '',
+      addresNumber: '',
+      addressComplement: null,
+    });
 
-    function saveUser(labelForm: string): void {
-      alert(labelForm);
+    function saveUser(user: createUserDto): void {
+      void axios
+        .post('http://localhost:3000/users', {
+          id: user.id,
+          name: user.name,
+          age: user.age,
+          ghub: user.ghub,
+          addressUF: user.addressUF,
+          addressCity: user.addressCity,
+          addressDistrict: user.addressDistrict,
+          addressStreet: user.addressStreet,
+          addresNumber: user.addresNumber,
+          addressComplement: user.addressComplement,
+        })
+        .then((res) => {
+          console.log(res.data);
+        });
     }
 
     function getAddress(cep: string) {
       const url = `http://viacep.com.br/ws/${cep}/json/`;
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        void axios.get<viacepResponse>(url).then((res) => {
-          const { uf, localidade, bairro, logradouro } = res.data;
-          state.value = uf;
-          city.value = localidade;
-          district.value = bairro;
-          street.value = logradouro;
+
+      void axios.get<viacepResponse>(url).then((res) => {
+        const { uf, localidade, bairro, logradouro, erro } = res.data;
+        if (erro) {
+          q.notify({
+            message: 'CEP não encontrado',
+            type: 'negative',
+            position: 'top',
+          });
+          return;
+        }
+        user.addressUF = uf;
+        user.addressCity = localidade;
+        user.addressDistrict = bairro;
+        user.addressStreet = logradouro;
+      });
+    }
+
+    async function verificationGhub(user: string) {
+      const url = `https://api.github.com/search/users?q=${user}`;
+      const res = await axios.get<ghubApiResponse>(url);
+      if (res.data.items.length < 1) {
+        q.notify({
+          message: 'Usuário não existe',
+          type: 'negative',
+          position: 'top',
         });
-      }, 300);
+      }
     }
 
     return {
-      id,
-      name,
-      age,
-      githubProfile,
-      cep,
-      state,
-      city,
-      district,
-      street,
-      addressNumber,
-      complement,
+      user,
       saveUser,
       getAddress,
+      verificationGhub,
     };
   },
 });
@@ -79,12 +108,13 @@ export default defineComponent({
         @click="$emit('CloseDialog')"
       />
     </div>
-    <q-form @submit="saveUser(labelForm)">
+    <!-- criar um obj user -->
+    <q-form @submit="saveUser(user)">
       <div class="q-col-gutter-md row col-12">
         <q-input
           class="col-12 col-sm-4"
           color="secondary"
-          v-model="id"
+          v-model="user.id"
           outlined
           type="number"
           label="Digite um ID"
@@ -94,7 +124,7 @@ export default defineComponent({
         <q-input
           class="col-12 col-sm-8"
           color="secondary"
-          v-model="name"
+          v-model="user.name"
           outlined
           label="Digite um nome "
           lazy-rules
@@ -103,7 +133,7 @@ export default defineComponent({
         <q-input
           class="col-12 col-sm-4"
           color="secondary"
-          v-model="age"
+          v-model="user.age"
           outlined
           type="number"
           label="Idade "
@@ -118,7 +148,8 @@ export default defineComponent({
         <q-input
           class="col-12 col-sm-8"
           color="secondary"
-          v-model="githubProfile"
+          v-model="user.ghub"
+          @focusout="verificationGhub(user.ghub)"
           outlined
           label="Usuário do github"
           lazy-rules
@@ -127,18 +158,21 @@ export default defineComponent({
         <q-input
           class="col-12 col-sm-2"
           color="secondary"
-          v-model="cep"
-          @focusout="getAddress(cep)"
+          v-model="user.cep"
+          @focusout="getAddress(user.cep)"
           outlined
           label="CEP "
           lazy-rules
           :mask="'########'"
-          :rules="[(val) => (val && val.length > 0) || 'Campo obrigatório']"
+          :rules="[
+            (val) => (val && val.length > 0) || 'Campo obrigatório',
+            (val) => val.length > 7 || 'Cep inválido',
+          ]"
         />
         <q-input
           class="col-12 col-sm-2"
           color="secondary"
-          v-model="state"
+          v-model="user.addressUF"
           outlined
           label="Estado "
           lazy-rules
@@ -146,7 +180,7 @@ export default defineComponent({
         <q-input
           class="col-12 col-sm-4"
           color="secondary"
-          v-model="city"
+          v-model="user.addressCity"
           outlined
           label="Cidade "
           lazy-rules
@@ -154,7 +188,7 @@ export default defineComponent({
         <q-input
           class="col-12 col-sm-4"
           color="secondary"
-          v-model="district"
+          v-model="user.addressDistrict"
           outlined
           label="Bairro "
           lazy-rules
@@ -162,14 +196,14 @@ export default defineComponent({
         <q-input
           class="col-12 col-sm-5"
           color="secondary"
-          v-model="street"
+          v-model="user.addressStreet"
           outlined
           label="Rua "
         />
         <q-input
           class="col-12 col-sm-2"
           color="secondary"
-          v-model="addressNumber"
+          v-model="user.addresNumber"
           outlined
           label="Numero "
           lazy-rules
@@ -179,7 +213,7 @@ export default defineComponent({
         <q-input
           class="col-12 col-sm-5"
           color="secondary"
-          v-model="complement"
+          v-model="user.addressComplement"
           outlined
           label="Complemento "
           lazy-rules

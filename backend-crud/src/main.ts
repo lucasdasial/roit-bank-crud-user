@@ -12,6 +12,7 @@ async function bootstrap() {
   FirebaseService.start();
   const app = await NestFactory.create(AppModule);
   app.useGlobalFilters(new HttpExceptionFilter());
+  app.enableCors();
 
   //error de atrbuição de tipagem do param
   //---> app.useGlobalInterceptors(new RoitResponseInterceptor());

@@ -36,18 +36,23 @@ export class FirebaseService {
       tag: number;
     };
     let res: ResposneMsg;
+    let exist = false;
     await this.db
       .collection(collection)
       .get()
       .then((docs) => {
         docs.forEach((doc) => {
           if (doc.id == docId) {
-            res = { message: 'doc alredy created', tag: 0 };
-            return;
+            exist = true;
           }
-          this.db.collection(collection).doc(docId).set(obj);
-          res = { message: 'doc created successfuly', tag: 1 };
         });
+
+        if (exist) {
+          return (res = { message: 'doc alredy exist', tag: 0 });
+        }
+
+        this.db.collection(collection).doc(docId).set(obj);
+        res = { message: 'doc created successfuly', tag: 1 };
       });
     return res;
   }

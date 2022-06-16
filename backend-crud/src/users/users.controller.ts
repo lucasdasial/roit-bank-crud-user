@@ -23,9 +23,13 @@ export class UsersController {
   async create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
     const result = await this.usersService.create(createUserDto);
     if (result.tag == 0) {
-      return res.status(HttpStatus.OK).json({ message: result.message });
+      return res
+        .status(HttpStatus.OK)
+        .json({ message: result.message, tag: 0 });
     }
-    return res.status(HttpStatus.CREATED).json({ message: result.message });
+    return res
+      .status(HttpStatus.CREATED)
+      .json({ message: result.message, tag: 1 });
   }
 
   @Get()
