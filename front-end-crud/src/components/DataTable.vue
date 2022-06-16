@@ -3,7 +3,7 @@ import { defineComponent, ref } from 'vue';
 import { useQuasar } from 'quasar';
 import UserDialogResgister from './UserDialogResgister.vue';
 import UserDialogDelete from './UserDialogDelete.vue';
-import { record } from 'src/@types';
+import { record } from 'src/@types/app';
 import { columnsProvider } from 'src/providers/dataTableColumns';
 
 export default defineComponent({
@@ -30,13 +30,6 @@ export default defineComponent({
         age: 21,
         github: 'luccasalves',
         address: 'belem',
-      },
-      {
-        id: 2,
-        name: 'jr',
-        age: 22,
-        github: 'noeRj',
-        address: 'rio',
       },
     ];
 

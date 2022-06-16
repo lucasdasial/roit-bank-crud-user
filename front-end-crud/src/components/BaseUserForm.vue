@@ -1,4 +1,6 @@
 <script lang="ts">
+import axios from 'axios';
+import { viacepResponse } from 'src/@types/viacep';
 import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
@@ -13,21 +15,36 @@ export default defineComponent({
     },
   },
   setup() {
-    const id = ref(0);
+    const id = ref();
     const name = ref('');
-    const age = ref(0);
+    const age = ref();
     const githubProfile = ref('');
 
-    const cep = ref('');
-    const uf = ref('');
-    const city = ref('');
-    const district = ref('');
-    const street = ref('');
-    const addressNumber = ref('');
-    const complement = ref('');
+    const cep = ref();
+    let state = ref();
+    let city = ref();
+    let district = ref();
+    let street = ref();
+    let addressNumber = ref();
+    const complement = ref();
+    let timer: string | number | NodeJS.Timeout | undefined;
 
     function saveUser(labelForm: string): void {
       alert(labelForm);
+    }
+
+    function getAddress(cep: string) {
+      const url = `http://viacep.com.br/ws/${cep}/json/`;
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        void axios.get<viacepResponse>(url).then((res) => {
+          const { uf, localidade, bairro, logradouro } = res.data;
+          state.value = uf;
+          city.value = localidade;
+          district.value = bairro;
+          street.value = logradouro;
+        });
+      }, 300);
     }
 
     return {
@@ -36,13 +53,14 @@ export default defineComponent({
       age,
       githubProfile,
       cep,
-      uf,
+      state,
       city,
       district,
       street,
       addressNumber,
       complement,
       saveUser,
+      getAddress,
     };
   },
 });
@@ -110,16 +128,17 @@ export default defineComponent({
           class="col-12 col-sm-2"
           color="secondary"
           v-model="cep"
+          @focusout="getAddress(cep)"
           outlined
           label="CEP "
           lazy-rules
-          :mask="'#####-###'"
+          :mask="'########'"
           :rules="[(val) => (val && val.length > 0) || 'Campo obrigatório']"
         />
         <q-input
           class="col-12 col-sm-2"
           color="secondary"
-          v-model="uf"
+          v-model="state"
           outlined
           label="Estado "
           lazy-rules
@@ -154,6 +173,8 @@ export default defineComponent({
           outlined
           label="Numero "
           lazy-rules
+          :rules="[(val) => (val && val.length > 0) || 'Campo obrigatório']"
+          :hint="'Caso não possuir digite \'s/n\''"
         />
         <q-input
           class="col-12 col-sm-5"
