@@ -1,11 +1,13 @@
-import { createUserDto, record } from './../@types/app';
+import { createUserDto } from './../@types/app';
 import { defineStore } from 'pinia';
+import axios from 'axios';
+import { Notify } from 'quasar';
 
 // useStore could be anything like useUser, useCart
 // the first argument is a unique id of the store across your application
 
 type State = {
-  rowsTable: Array<record>;
+  rowsTable: Array<createUserDto>;
 };
 
 export const useTableStore = defineStore('datatable', {
@@ -21,13 +23,43 @@ export const useTableStore = defineStore('datatable', {
     },
   },
   actions: {
-    setRecordAtTable(record: record): void {
-      const obRecord: record = {
+    updateRows(array: Array<createUserDto>) {
+      this.rowsTable = array;
+    },
+    setRecordAtTable(record: createUserDto): void {
+      const obRecord: createUserDto = {
         address: `${record.addressStreet}, ${record.addresNumber},
           ${record.addressDistrict} -  ${record.addressCity}/${record.addressUF}`,
         ...record,
       };
       this.rowsTable.push(obRecord);
+    },
+    deleleRecord(id: string) {
+      this.rowsTable.forEach((record) => {
+        if (record.id == id) {
+          // const i = this.rowsTable.indexOf(record);
+          const newlist = this.rowsTable.filter((item) => item.id !== id);
+          this.updateRows(newlist);
+
+          void axios.delete(`http://localhost:3000/users/${id}`).then((res) => {
+            if (res.status == 200) {
+              Notify.create({
+                message: 'Opereção feita com sucesso',
+                type: 'positive',
+                position: 'top',
+              });
+              return;
+            }
+            Notify.create({
+              message: 'Ocorreu um erro, tente novamente',
+              type: 'negative',
+              position: 'top',
+            });
+          });
+
+          return;
+        }
+      });
     },
   },
 });

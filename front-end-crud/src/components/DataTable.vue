@@ -1,9 +1,9 @@
 <script lang="ts">
-import { defineComponent, reactive, ref } from 'vue';
+import { defineComponent, ref } from 'vue';
 import { useQuasar } from 'quasar';
 import UserDialogResgister from './UserDialogResgister.vue';
 import UserDialogDelete from './UserDialogDelete.vue';
-import { record } from 'src/@types/app';
+import { createUserDto } from 'src/@types/app';
 import { columnsMock } from 'src/mocks/dataTableColumns';
 import axios from 'axios';
 import { useTableStore } from 'src/stores/datatableStore';
@@ -18,14 +18,14 @@ export default defineComponent({
     const tableStore = useTableStore();
     q.loading.show();
 
-    void axios.get<record[]>('http://localhost:3000/users').then((res) => {
-      res.data.forEach((user) => {
-        tableStore.setRecordAtTable(user);
+    void axios
+      .get<createUserDto[]>('http://localhost:3000/users')
+      .then((res) => {
+        res.data.forEach((user) => {
+          tableStore.setRecordAtTable(user);
+        });
+        q.loading.hide();
       });
-      q.loading.hide();
-    });
-
-    console.log(tableStore.getRows);
 
     const initialPagination = {
       sortBy: 'asc',
@@ -36,8 +36,8 @@ export default defineComponent({
 
     const columns = columnsMock;
 
-    function deleteRecord(userId: unknown): void {
-      alert(userId);
+    function deleteRecord(userId: string): void {
+      tableStore.deleleRecord(userId);
     }
     return {
       q,

@@ -50,7 +50,6 @@ export default defineComponent({
             label="excluir"
             color="negative"
             @click="$emit('deleteRecord')"
-            v-close-popup
           />
         </q-card-actions>
       </q-card>

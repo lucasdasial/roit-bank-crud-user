@@ -64,7 +64,7 @@ export default defineComponent({
         return;
       }
 
-      // tableStore.setRecordAtTable(user);
+      tableStore.setRecordAtTable(user);
       emits.emit('CloseDialog');
       q.loading.hide();
       q.notify({
