@@ -26,6 +26,7 @@ export default defineComponent({
     const user = reactive<createUserDto>({
       id: '',
       name: '',
+      email: '',
       age: null,
       ghub: '',
       cep: '',
@@ -44,6 +45,7 @@ export default defineComponent({
         {
           id: user.id,
           name: user.name,
+          email: user.email,
           age: user.age,
           ghub: user.ghub,
           cep: user.cep,
@@ -130,9 +132,18 @@ export default defineComponent({
         @click="$emit('CloseDialog')"
       />
     </div>
-    <!-- criar um obj user -->
     <q-form @submit="saveUser(user)">
       <div class="q-col-gutter-md row col-12">
+        <q-input
+          class="col-12"
+          color="secondary"
+          v-model="user.email"
+          type="email"
+          outlined
+          label="Digite um email "
+          lazy-rules
+          :rules="[(val) => (val && val.length > 0) || 'Campo obrigatório']"
+        />
         <q-input
           class="col-12 col-sm-4"
           color="secondary"
@@ -152,6 +163,7 @@ export default defineComponent({
           lazy-rules
           :rules="[(val) => (val && val.length > 0) || 'Campo obrigatório']"
         />
+
         <q-input
           class="col-12 col-sm-4"
           color="secondary"

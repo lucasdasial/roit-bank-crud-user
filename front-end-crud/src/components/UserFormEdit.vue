@@ -89,6 +89,30 @@ export default defineComponent({
     <q-form @submit="updateAndSaveUser(user)">
       <div class="q-col-gutter-md row col-12">
         <q-input
+          class="col-12"
+          color="secondary"
+          v-model="user.email"
+          type="email"
+          outlined
+          label="Digite um email "
+          lazy-rules
+          :rules="[(val) => (val && val.length > 0) || 'Campo obrigatório']"
+        >
+          <template v-slot:append>
+            <q-icon name="info" color="primary">
+              <q-tooltip
+                anchor="top middle"
+                self="bottom middle"
+                :offset="[10, 10]"
+              >
+                Por motivos de segurança seu email esta sendo exebido
+                criptografado
+              </q-tooltip>
+            </q-icon>
+          </template>
+        </q-input>
+
+        <q-input
           class="col-12 col-sm-4"
           color="secondary"
           v-model="user.id"

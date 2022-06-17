@@ -2,7 +2,7 @@
   "name": "front-end-crud",
   "version": "0.0.1",
   "description": "interface do crud roit",
-  "productName": "Quasar App",
+  "productName": "CRUD USERS",
   "author": "Lucas Alves <as.lucasalves@gmail.com>",
   "private": true,
   "scripts": {

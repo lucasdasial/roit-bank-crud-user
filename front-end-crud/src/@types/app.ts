@@ -1,6 +1,7 @@
 export type createUserDto = {
   id: string;
   name: string;
+  email: string;
   age: number | null;
   ghub: string;
   cep: string;
@@ -15,6 +16,7 @@ export type createUserDto = {
 export type updateUserDto = {
   id?: string;
   name?: string;
+  email?: string;
   age?: number | null;
   ghub?: string;
   cep?: string;

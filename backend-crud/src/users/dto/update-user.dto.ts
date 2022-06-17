@@ -9,7 +9,11 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @ApiProperty()
   age?: number;
   @ApiProperty()
+  email?: string;
+  @ApiProperty()
   ghub?: string;
+  @ApiProperty()
+  cep?: string;
   @ApiProperty()
   adrsUF?: string;
   @ApiProperty()
@@ -19,7 +23,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @ApiProperty()
   addressStreet?: string;
   @ApiProperty()
-  addresNumber?: number;
+  addresNumber?: string;
   @ApiProperty()
   addressComplement?: string;
 }

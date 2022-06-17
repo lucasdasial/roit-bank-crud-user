@@ -9,7 +9,11 @@ export class CreateUserDto {
   @ApiProperty()
   age: number;
   @ApiProperty()
+  email: string;
+  @ApiProperty()
   ghub: string;
+  @ApiProperty()
+  cep: string;
   @ApiProperty()
   addressUF: string;
   @ApiProperty()
@@ -19,7 +23,7 @@ export class CreateUserDto {
   @ApiProperty()
   addressStreet: string;
   @ApiProperty()
-  addresNumber: number;
+  addresNumber: string;
   @ApiProperty()
   addressComplement?: string;
 }
