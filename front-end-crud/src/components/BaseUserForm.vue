@@ -1,9 +1,10 @@
 <script lang="ts">
 import axios from 'axios';
 import { useQuasar } from 'quasar';
-import { apiCrudResponse, createUserDto } from 'src/@types/app';
+import { apiCrudPostResponse, createUserDto } from 'src/@types/app';
 import { ghubApiResponse } from 'src/@types/ghubApi';
 import { viacepResponse } from 'src/@types/viacep';
+import { useTableStore } from 'src/stores/datatableStore';
 import { defineComponent, reactive } from 'vue';
 
 export default defineComponent({
@@ -20,11 +21,12 @@ export default defineComponent({
   emits: ['CloseDialog'],
   setup(props, emits) {
     const q = useQuasar();
+    const tableStore = useTableStore();
 
     const user = reactive<createUserDto>({
       id: '',
       name: '',
-      age: 0,
+      age: null,
       ghub: '',
       cep: '',
       addressUF: '',
@@ -37,7 +39,7 @@ export default defineComponent({
 
     async function saveUser(user: createUserDto): Promise<void> {
       q.loading.show();
-      const res = await axios.post<apiCrudResponse>(
+      const res = await axios.post<apiCrudPostResponse>(
         'http://localhost:3000/users',
         {
           id: user.id,
@@ -61,6 +63,8 @@ export default defineComponent({
         });
         return;
       }
+
+      // tableStore.setRecordAtTable(user);
       emits.emit('CloseDialog');
       q.loading.hide();
       q.notify({

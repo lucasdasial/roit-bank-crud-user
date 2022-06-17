@@ -1,6 +1,6 @@
 import { QTableProps } from 'quasar';
 
-export const columnsProvider: QTableProps['columns'] = [
+export const columnsMock: QTableProps['columns'] = [
   {
     name: 'id',
     label: 'ID',
@@ -25,7 +25,7 @@ export const columnsProvider: QTableProps['columns'] = [
   {
     name: 'github',
     label: 'Github profile',
-    field: 'github',
+    field: 'ghub',
     align: 'left',
     headerClasses: 'bg-grey-3',
   },

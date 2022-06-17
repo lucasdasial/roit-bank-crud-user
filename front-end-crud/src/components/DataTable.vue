@@ -1,10 +1,12 @@
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, reactive, ref } from 'vue';
 import { useQuasar } from 'quasar';
 import UserDialogResgister from './UserDialogResgister.vue';
 import UserDialogDelete from './UserDialogDelete.vue';
 import { record } from 'src/@types/app';
-import { columnsProvider } from 'src/providers/dataTableColumns';
+import { columnsMock } from 'src/mocks/dataTableColumns';
+import axios from 'axios';
+import { useTableStore } from 'src/stores/datatableStore';
 
 export default defineComponent({
   components: {
@@ -13,6 +15,17 @@ export default defineComponent({
   },
   setup() {
     const q = useQuasar();
+    const tableStore = useTableStore();
+    q.loading.show();
+
+    void axios.get<record[]>('http://localhost:3000/users').then((res) => {
+      res.data.forEach((user) => {
+        tableStore.setRecordAtTable(user);
+      });
+      q.loading.hide();
+    });
+
+    console.log(tableStore.getRows);
 
     const initialPagination = {
       sortBy: 'asc',
@@ -21,17 +34,7 @@ export default defineComponent({
       rowsPerPage: 5,
     };
 
-    const columns = columnsProvider;
-
-    const rows: Array<record> = [
-      {
-        id: 1,
-        name: 'lucas',
-        age: 21,
-        github: 'luccasalves',
-        address: 'belem',
-      },
-    ];
+    const columns = columnsMock;
 
     function deleteRecord(userId: unknown): void {
       alert(userId);
@@ -39,9 +42,9 @@ export default defineComponent({
     return {
       q,
       columns,
-      rows,
-      deleteRecord,
+      tableStore,
       initialPagination,
+      deleteRecord,
       filter: ref(''),
     };
   },
@@ -51,7 +54,7 @@ export default defineComponent({
 <template>
   <div>
     <q-table
-      :rows="rows"
+      :rows="tableStore.getRows"
       :columns="columns"
       row-key="id"
       :pagination="initialPagination"
