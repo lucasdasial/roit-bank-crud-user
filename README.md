@@ -10,7 +10,7 @@
 </p>
 
  <ul align="center">
-  <a href="https://nestjs.com/" target="_blank">Nestejs</a> + <a href="https://vuejs.org/" target="_blank">Vuejs</a> + <a href="https://quasar.dev/"  target="_blank">Quasar</a> + <a href="https://firebase.google.com/" target="_blank">Firebase</a>
+  <a href="https://nestjs.com/" target="_blank">Nestjs</a> + <a href="https://vuejs.org/" target="_blank">Vuejs</a> + <a href="https://quasar.dev/"  target="_blank">Quasar</a> + <a href="https://firebase.google.com/" target="_blank">Firebase</a>
  </ul>
 
 ## Instruções 
@@ -55,4 +55,8 @@ Alem da api desenvolvida com nest a aplicação consome outas duas apis externas
   - verificar se usuário do github existe na plataforma
   - salvar o link do perfil 
   - salvar o link dos repositorios do usuario 
+ #### Banco:
+  A persistência dos dados ficou organizada no firebase da seguinte forma:
+
+  <img src="https://firebasestorage.googleapis.com/v0/b/crud-users-roit.appspot.com/o/crud-banco.png?alt=media&token=bf0b7b65-5bc7-48c6-8905-70205d74c2a3" width:300px></img>
 
