@@ -34,15 +34,6 @@ export default defineComponent({
 <template>
   <div>
     <q-btn
-      v-if="actionTypeButton == 'edit'"
-      icon="edit"
-      color="secondary"
-      flat
-      round
-      dense
-      @click="openDialog = true"
-    />
-    <q-btn
       v-if="actionTypeButton == 'create'"
       label="Cadastrar"
       color="primary"

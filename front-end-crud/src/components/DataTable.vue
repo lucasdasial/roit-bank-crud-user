@@ -7,11 +7,13 @@ import { createUserDto } from 'src/@types/app';
 import { columnsMock } from 'src/mocks/dataTableColumns';
 import axios from 'axios';
 import { useTableStore } from 'src/stores/datatableStore';
+import UserDialogEdit from './UserDialogEdit.vue';
 
 export default defineComponent({
   components: {
     UserDialogResgister,
     UserDialogDelete,
+    UserDialogEdit,
   },
   setup() {
     const q = useQuasar();
@@ -87,12 +89,7 @@ export default defineComponent({
           <div class="row justify-center q-gutter-md no-wrap">
             <UserDialogDelete @delete-record="deleteRecord(props.key)" />
 
-            <UserDialogResgister
-              :userId="props.key"
-              :actionTypeButton="'edit'"
-              :labelButton="'Salvar'"
-              :labelForm="'Editar'"
-            />
+            <UserDialogEdit :id="props.key" />
           </div>
         </q-td>
       </template>

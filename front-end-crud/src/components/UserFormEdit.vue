@@ -1,80 +1,32 @@
 <script lang="ts">
 import axios from 'axios';
 import { useQuasar } from 'quasar';
-import { apiCrudPostResponse, createUserDto } from 'src/@types/app';
-import { ghubApiResponse } from 'src/@types/ghubApi';
+import { apiCrudPatchResponse, updateUserDto } from 'src/@types/app';
 import { viacepResponse } from 'src/@types/viacep';
 import { useTableStore } from 'src/stores/datatableStore';
-import { defineComponent, reactive } from 'vue';
+import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
+  emits: ['CloseDialog'],
   props: {
-    labelButton: {
-      type: String,
-      required: true,
-    },
-    labelForm: {
+    id: {
       type: String,
       required: true,
     },
   },
-  emits: ['CloseDialog'],
   setup(props, emits) {
     const q = useQuasar();
     const tableStore = useTableStore();
-
-    const user = reactive<createUserDto>({
-      id: '',
-      name: '',
-      age: null,
-      ghub: '',
-      cep: '',
-      addressUF: '',
-      addressCity: '',
-      addressDistrict: '',
-      addressStreet: '',
-      addresNumber: '',
-      addressComplement: null,
-    });
-
-    async function saveUser(user: createUserDto): Promise<void> {
-      q.loading.show();
-      const res = await axios.post<apiCrudPostResponse>(
-        'http://localhost:3000/users',
-        {
-          id: user.id,
-          name: user.name,
-          age: user.age,
-          ghub: user.ghub,
-          cep: user.cep,
-          addressUF: user.addressUF,
-          addressCity: user.addressCity,
-          addressDistrict: user.addressDistrict,
-          addressStreet: user.addressStreet,
-          addresNumber: user.addresNumber,
-          addressComplement: user.addressComplement,
-        }
-      );
-      if (res.data.tag == 0) {
-        q.loading.hide();
-        q.notify({
-          message: 'Usuário já existe',
-          type: 'info',
-          position: 'top',
-        });
+    const list = tableStore.getRows;
+    const userId = ref('');
+    let user = ref<updateUserDto>({});
+    list.forEach((record) => {
+      if (record.id == props.id) {
+        userId.value = record.id;
+        user.value = record;
         return;
       }
-
-      tableStore.setRecordAtTable(user);
-      emits.emit('CloseDialog');
-      q.loading.hide();
-      q.notify({
-        message: 'Conta criada',
-        type: 'positive',
-        position: 'top',
-      });
-    }
-
+    });
     function getAddress(cep: string) {
       const url = `http://viacep.com.br/ws/${cep}/json/`;
 
@@ -88,30 +40,34 @@ export default defineComponent({
           });
           return;
         }
-        user.addressUF = uf;
-        user.addressCity = localidade;
-        user.addressDistrict = bairro;
-        user.addressStreet = logradouro;
+        user.value.addressUF = uf;
+        user.value.addressCity = localidade;
+        user.value.addressDistrict = bairro;
+        user.value.addressStreet = logradouro;
       });
     }
 
-    async function verificationGhub(user: string) {
-      const url = `https://api.github.com/search/users?q=${user}`;
-      const res = await axios.get<ghubApiResponse>(url);
-      if (res.data.items.length < 1) {
+    async function updateAndSaveUser(userFromForm: updateUserDto) {
+      const res = await axios.patch<apiCrudPatchResponse>(
+        `http://localhost:3000/users/${userId.value}`,
+        {
+          ...userFromForm,
+        }
+      );
+      if (res.data.message == 'doc updated') {
         q.notify({
-          message: 'Usuário não existe',
-          type: 'negative',
+          message: 'Atualizado',
+          type: 'positive',
           position: 'top',
+          timeout: 2000,
         });
+        emits.emit('CloseDialog');
       }
     }
-
     return {
       user,
-      saveUser,
+      updateAndSaveUser,
       getAddress,
-      verificationGhub,
     };
   },
 });
@@ -120,7 +76,7 @@ export default defineComponent({
 <template>
   <q-card class="card q-pa-md">
     <div class="row justify-between items-center q-mb-md">
-      <p class="text-h6 q-ma-none">{{ labelForm }}</p>
+      <p class="text-h6 q-ma-none">Editar</p>
       <q-btn
         icon="close"
         color="grey-5"
@@ -130,13 +86,13 @@ export default defineComponent({
         @click="$emit('CloseDialog')"
       />
     </div>
-    <!-- criar um obj user -->
-    <q-form @submit="saveUser(user)">
+    <q-form @submit="updateAndSaveUser(user)">
       <div class="q-col-gutter-md row col-12">
         <q-input
           class="col-12 col-sm-4"
           color="secondary"
           v-model="user.id"
+          disable
           outlined
           type="number"
           label="Digite um ID"
@@ -171,7 +127,6 @@ export default defineComponent({
           class="col-12 col-sm-8"
           color="secondary"
           v-model="user.ghub"
-          @focusout="verificationGhub(user.ghub)"
           outlined
           label="Usuário do github"
           lazy-rules
@@ -246,7 +201,7 @@ export default defineComponent({
           <q-btn color="primary" outline @click="$emit('CloseDialog')"
             >Cancelar</q-btn
           >
-          <q-btn color="primary" type="submit">{{ labelButton }}</q-btn>
+          <q-btn color="primary" type="submit">Salvar</q-btn>
         </div>
       </section>
     </q-form>

@@ -3,9 +3,6 @@ import { defineStore } from 'pinia';
 import axios from 'axios';
 import { Notify } from 'quasar';
 
-// useStore could be anything like useUser, useCart
-// the first argument is a unique id of the store across your application
-
 type State = {
   rowsTable: Array<createUserDto>;
 };
