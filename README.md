@@ -40,7 +40,7 @@ $ npx quasar dev
 ### Observações:
 
 #### Backend-crud
-- A api possui documentção com swagger e pode ser acessada atras da url "http://localhost:3000"
+- A api possui documentção com swagger e pode ser acessada através da url do servidor startado
 
 - Nas rotas de post e patch foi implementado criptografia para o campo email, utilizando a biblioteca <a href="https://www.npmjs.com/package/bcrypt" target="_blank">bcrypt</a>
 
