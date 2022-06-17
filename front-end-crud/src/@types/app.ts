@@ -4,6 +4,8 @@ export type createUserDto = {
   email: string;
   age: number | null;
   ghub: string;
+  ghub_url_profile: string;
+  ghub_url_repo: string;
   cep: string;
   addressUF: string;
   addressCity: string;

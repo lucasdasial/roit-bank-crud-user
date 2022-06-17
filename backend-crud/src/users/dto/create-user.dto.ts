@@ -13,6 +13,10 @@ export class CreateUserDto {
   @ApiProperty()
   ghub: string;
   @ApiProperty()
+  ghub_url_profile: string;
+  @ApiProperty()
+  ghub_url_repo: string;
+  @ApiProperty()
   cep: string;
   @ApiProperty()
   addressUF: string;

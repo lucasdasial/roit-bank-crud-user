@@ -29,6 +29,8 @@ export default defineComponent({
       email: '',
       age: null,
       ghub: '',
+      ghub_url_profile: '',
+      ghub_url_repo: '',
       cep: '',
       addressUF: '',
       addressCity: '',
@@ -48,6 +50,8 @@ export default defineComponent({
           email: user.email,
           age: user.age,
           ghub: user.ghub,
+          ghub_url_profile: user.ghub_url_profile,
+          ghub_url_repo: user.ghub_url_repo,
           cep: user.cep,
           addressUF: user.addressUF,
           addressCity: user.addressCity,
@@ -97,8 +101,8 @@ export default defineComponent({
       });
     }
 
-    async function verificationGhub(user: string) {
-      const url = `https://api.github.com/search/users?q=${user}`;
+    async function verificationGhub(username: string) {
+      const url = `https://api.github.com/search/users?q=${username}`;
       const res = await axios.get<ghubApiResponse>(url);
       if (res.data.items.length < 1) {
         q.notify({
@@ -106,7 +110,16 @@ export default defineComponent({
           type: 'negative',
           position: 'top',
         });
+
+        return;
       }
+
+      res.data.items.forEach((item) => {
+        if (item.login == username) {
+          user.ghub_url_profile = item.html_url;
+          user.ghub_url_repo = item.repos_url;
+        }
+      });
     }
 
     return {
